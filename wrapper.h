@@ -51,3 +51,18 @@ ssize_t Sendto(int sockfd, const void *buf, size_t len, int flags,
 	return rc;
 }
 
+//int getsockopt(int sockfd, int level, int optname,
+//							 void *optval, socklen_t *optlen);
+
+static inline 
+int Setsockopt(int sockfd, int level, int optname,
+		const void *optval, socklen_t optlen) 
+{
+	int rc;
+	if ((rc = setsockopt(sockfd, level, optname, optval, optlen)) == -1) {
+		perror("setsockopt");
+		exit(0);
+	}
+	return rc;
+}
+
