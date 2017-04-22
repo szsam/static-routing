@@ -1,6 +1,6 @@
 # raw_socket_recv.c  tables.c  tables.h  wrapper.h
 CC := gcc
-CFLAGS := -c -O2
+CFLAGS := -c -Wall -O0 -g
 
 OBJS := routing.o tables.o
 
