@@ -235,6 +235,7 @@ int main(int argc, char* argv[]){
 
 	gettimeofday(&begin_tv,NULL);
 
+	/* Send ping request, receive ping reply */
 	while(count--)
 	{
 		icmpRequest(socket_fd,sequence++);nr_transmited++;
