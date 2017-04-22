@@ -50,6 +50,9 @@ void parse_iphdr(struct iphdr *ip)
 
 int main()
 {
+	/* Read configuration files */
+	init_config();
+
 	// Opening a raw socket
 	int sock_r;
 	sock_r = Socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
@@ -85,16 +88,18 @@ int main()
 		parse_iphdr(ip);
 
 		// get the IP address of next hop
-		int rou_ix = search_route_tbl(ntohl(ip->daddr));
+		struct in_addr dst_addr;
+		dst_addr.s_addr = ip->daddr;
+		int rou_ix = search_route_tbl(dst_addr);
 		if (rou_ix == -1) {
 			printf("No route rule for the destination IP\n");
 			continue;
 		}
-		uint32_t next_hop_ipaddr = gateway(rou_ix);
+		struct in_addr next_hop_ipaddr = gateway(rou_ix);
 		// if Gateway is 0.0.0.0, then the destination and 
 		// (one of the interfaces of) the router is in the same subnet
-		if (next_hop_ipaddr == 0)
-			next_hop_ipaddr = ntohl(ip->daddr);
+		if (next_hop_ipaddr.s_addr == 0)
+			next_hop_ipaddr = dst_addr;
 		
 		// get the MAC address corresponding to next hop's IP address
 		const uint8_t *next_hop_hwaddr = ip2mac(next_hop_ipaddr);
