@@ -21,6 +21,25 @@ const char *LOCAL_IP = "192.168.3.2";
 #define BUFFSIZ 65536 
 unsigned char buffer[BUFFSIZ];
 
+unsigned short checkSum(unsigned short *addr, int size){
+	unsigned int sum      =0;
+	unsigned short *w     =addr;
+
+	while(size>1)
+	{
+		sum+=*w++;
+		size-=2;
+	}
+
+	if(size==1)  
+		sum+=*w;  
+
+	sum=(sum>>16)+(sum&0xffff); 
+	sum=(sum>>16)+(sum&0xffff); 
+	// sum+=(sum>>16);  
+	return (unsigned short)(~sum); 
+}
+
 int main()
 {
 	// Opening a raw socket
@@ -61,9 +80,14 @@ int main()
 		// Change the source and destination IP address
 		ip->daddr = ip->saddr;
 		ip->saddr = inet_addr(LOCAL_IP);
+		ip->check = 0;
+		ip->check = checkSum((unsigned short *)ip, sizeof(struct iphdr));
 		
 		// Change ICMP header
 		icmp_hdr->type = ICMP_ECHOREPLY;	
+		icmp_hdr->checksum = 0;
+		icmp_hdr->checksum = checkSum((unsigned short *)icmp_hdr, 
+				sizeof(struct icmphdr) + sizeof(struct timeval));
 
 		// Getting the index of the interface to send a packet
 		struct ifreq ifreq_i;
