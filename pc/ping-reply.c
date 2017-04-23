@@ -13,8 +13,8 @@
 #include "../wrapper.h"
 
 const char *IFACE_NAME = "eth0";
-const unsigned char NEXT_HOP_HWADDR[ETH_ALEN] = { 0x0 };
-const unsigned char LOCAL_HWADDR[ETH_ALEN] = { 0x0 };
+const unsigned char NEXT_HOP_HWADDR[ETH_ALEN] = { 0x00,0x0c,0x29,0x94,0x6c,0xcb };
+const unsigned char LOCAL_HWADDR[ETH_ALEN] = { 0x00,0x0c,0x29,0x73,0x40,0x18 };
 const unsigned char BROADCAST_HWADDR[ETH_ALEN] = {0xff,0xff,0xff,0xff,0xff,0xff};
 const char *LOCAL_IP = "192.168.3.2"; 
 
@@ -54,9 +54,11 @@ int main()
 
 		// Extracting the Ethernet header
 		struct ethhdr *eth = (struct ethhdr *)(buffer);
-		if (strncmp((char *)eth->h_source, (char *)LOCAL_HWADDR, ETH_ALEN) ||
+		if (strncmp((char *)eth->h_source, (char *)LOCAL_HWADDR, ETH_ALEN) &&
 			strncmp((char *)eth->h_source, (char *)BROADCAST_HWADDR, ETH_ALEN))
 			continue;
+		printf("Ethernet header checked\n");
+		
 
 		// Extracting the IP header
 		struct iphdr *ip = (struct iphdr*)(buffer + sizeof(struct ethhdr));
@@ -65,12 +67,14 @@ int main()
 		dst_in_addr.s_addr = ip->daddr;
 		if (local_in_addr.s_addr != dst_in_addr.s_addr || ip->protocol != 1)
 			continue;
+		printf("IP header checked\n");
 
-		// Extracting the IP header
+		// Extracting the ICMP header
 		struct icmphdr *icmp_hdr = 
 			(struct icmphdr *)(buffer + sizeof(struct ethhdr) + sizeof(struct iphdr));
-		if (icmp_hdr->type  == ICMP_ECHO)
+		if (icmp_hdr->type  != ICMP_ECHO)
 			continue;
+		printf("ICMP header checked\n");
 
 		/* Send ping reply */
 		// Change the source and destination MAC address

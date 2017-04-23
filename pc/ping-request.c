@@ -27,8 +27,8 @@ int SEC_SLEEP_PER_ECHO =1;
 
 struct sockaddr_ll sadr_ll;
 const char *IFACE_NAME = "eth0";
-const unsigned char NEXT_HOP_HWADDR[ETH_ALEN] = { 0x0 };
-const unsigned char LOCAL_HWADDR[ETH_ALEN] = { 0x0 };
+const unsigned char NEXT_HOP_HWADDR[ETH_ALEN] = { 0x00,0x0c,0x29,0x8c,0xf6,0xc9 };
+const unsigned char LOCAL_HWADDR[ETH_ALEN] = { 0x00,0x0c,0x29,0x37,0xf5,0xba };
 const char *LOCAL_IP = "192.168.1.1"; 
 
 struct timeval begin_tv;
